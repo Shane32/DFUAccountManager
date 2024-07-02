@@ -7,15 +7,12 @@ Logo by BlasterBuilder.
 ## Run and Install 
 * Clone this repository
 * Install `requirements.txt`
-* Create `credentials.py`
-```py
-# credentials.py
-
-# Make sure this is a long random string
-SECRET_KEY = 'long-random-string'
-
-# Replace instances of <> with the database credentials
-DB_URL = 'mysql+pymysql://<mysql-user>:<mysql-password>@<mysql-host>/<mysql-database>'
+* Create `credentials.json`; replace SECRET_KEY with a long random string and instances of <> with the database credentials
+```json
+{
+    "SECRET_KEY": "long-random-string",
+    "DB_URL": "mysql+pymysql://<mysql-user>:<mysql-password>@<mysql-host>/<mysql-database>"
+}
 ```
 * Create `resources.py`
 ```py

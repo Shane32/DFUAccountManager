@@ -1,0 +1,73 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.8'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller==6.8.0
+
+    - name: Compile application
+      run: |
+        pyinstaller --onefile --name DFUAccountManagerWindows --add-data "static;static" --add-data "templates;templates" app.py
+
+    - name: Rename and store artifact
+      run: |
+        Rename-Item -Path dist\DFUAccountManagerWindows.exe -NewName DFUAccountManagerWindows.exe
+        New-Item -ItemType Directory -Force -Path artifact
+        Move-Item -Path dist\DFUAccountManagerWindows.exe -Destination artifact/
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: DFUAccountManagerWindows
+        path: artifact/DFUAccountManagerWindows.exe
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.8'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller==6.8.0
+
+    - name: Compile application
+      run: |
+        pyinstaller --onefile --name DFUAccountManagerLinux --add-data "static:static" --add-data "templates:templates" app.py
+
+    - name: Rename and store artifact
+      run: |
+        mv dist/DFUAccountManagerLinux DFUAccountManagerLinux
+        mkdir -p artifact
+        mv DFUAccountManagerLinux artifact/
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: DFUAccountManagerLinux
+        path: artifact/DFUAccountManagerLinux

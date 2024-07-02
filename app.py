@@ -25,7 +25,12 @@ class Resources():
 resources = Resources()
 
 # Application instance
-app = Flask(__name__)
+if getattr(sys, 'frozen', False):
+    template_folder = os.path.join(sys._MEIPASS, 'templates')
+    static_folder = os.path.join(sys._MEIPASS, 'static')
+    app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
+else:
+    app = Flask(__name__)
 
 # SQL instance
 db = SQLAlchemy()
@@ -533,10 +538,11 @@ def run_app():
 
     # If either of the env variables are not set, attempt to read them from credentials.py.
     if not secret_key or not db_url:
-        from credentials import SECRET_KEY, DB_URL
+        with open('credentials.json', 'r') as file:
+            credentials = json.load(file)
 
-        secret_key = SECRET_KEY
-        db_url = DB_URL
+        secret_key = credentials['SECRET_KEY']
+        db_url = credentials['DB_URL']
 
     app.config['DEBUG'] = True
     app.config['SECRET_KEY'] = secret_key
